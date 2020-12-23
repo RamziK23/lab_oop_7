@@ -22,7 +22,7 @@ namespace lab_oop_7
         static int k = 5;
         Storage storag = new Storage(k);
         static int index = 0;
-        int indexin = 0;
+        static int indexin = 0;
         int figure_now = 0;
 
         public class Figure
@@ -32,6 +32,7 @@ namespace lab_oop_7
             public Color fillcolor = Color.White;
 
             public virtual void GroupAddFigure(ref Figure object1) { }
+            public virtual void UnGroup(ref Storage stg, int c) { }
             public virtual void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box) { }
             public virtual void move_x(int x, Panel paint_box) { }
             public virtual void move_y(int y, Panel paint_box) { }
@@ -57,6 +58,14 @@ namespace lab_oop_7
                     return;
                 group[count] = object1;
                 ++count;
+            }
+            public override void UnGroup(ref Storage stg, int c)
+            {
+                stg.delete_object(c);
+                for (int i = 0; i < count; ++i)
+                {
+                    stg.add_object(index, ref group[i], k, ref indexin);
+                }
             }
             public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
             {
@@ -603,7 +612,15 @@ namespace lab_oop_7
 
         private void button_ungroup_Click(object sender, EventArgs e)
         {
-           
+            for (int i = 0; i < k; ++i)
+            {
+                if (!storag.check_empty(i))
+                    if (storag.objects[i].color == Color.Red)
+                    {
+                        storag.objects[i].UnGroup(ref storag, i);
+                        return;
+                    }
+            }
         }
 
         //private void check(int f, int y, int gran, int gran1, ref Figure figures, int g)

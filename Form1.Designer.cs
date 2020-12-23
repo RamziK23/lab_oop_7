@@ -116,6 +116,7 @@
             this.button_ungroup.Text = "Разгруппировка";
             this.button_ungroup.UseVisualStyleBackColor = true;
             this.button_ungroup.Click += new System.EventHandler(this.button_ungroup_Click);
+            this.button_ungroup.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // Form1
             // 
