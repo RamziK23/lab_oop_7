@@ -1,0 +1,10 @@
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\bin\Debug\lab_oop_7.exe.config
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\bin\Debug\lab_oop_7.exe
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\bin\Debug\lab_oop_7.pdb
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.csprojAssemblyReference.cache
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.Form1.resources
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.Properties.Resources.resources
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.csproj.GenerateResource.cache
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.csproj.CoreCompileInputs.cache
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.exe
+C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\obj\Debug\lab_oop_7.pdb
