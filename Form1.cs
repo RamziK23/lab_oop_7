@@ -25,12 +25,24 @@ namespace lab_oop_7
         int indexin = 0;
         int figure_now = 0;
 
-        class Figure
+        public class Figure
         {
             public int x, y;
             public Color color = Color.Navy;
             public Color fillcolor = Color.White;
+
+            public virtual void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box) { }
+            public virtual void move_x(int x, Panel paint_box) { }
+            public virtual void move_y(int y, Panel paint_box) { }
+            public virtual void changesize(int size) { }
+            public virtual bool checkfigure(int x, int y) { return false; }
         }
+
+        class Group : Figure
+        {
+
+        }
+
         class Circle : Figure
         {
             //public int x, y; // Координаты круга
@@ -40,7 +52,34 @@ namespace lab_oop_7
                 this.x = x - rad;
                 this.y = y - rad;
             }
-
+            public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
+            {
+                paint_box.CreateGraphics().DrawEllipse(
+                    pen, x, y, rad * 2, rad * 2);
+                paint_box.CreateGraphics().FillEllipse(
+                    figurefillcolor, x, y, rad * 2, rad * 2);
+            }
+            public override void move_x(int x, Panel paint_box)
+            {
+                int c = this.x + x;
+                int gran = paint_box.ClientSize.Width - (rad * 2);
+                check(c, x, gran, gran - 2, ref this.x);
+            }
+            public override void move_y(int y, Panel paint_box)
+            {
+                int c = this.y + y;
+                int gran = paint_box.ClientSize.Height - (rad * 2);
+                check(c, y, gran, gran - 2, ref this.y);
+            }
+            public override void changesize(int size)
+            {
+                rad += size;
+            }
+            public override bool checkfigure(int x, int y)
+            {
+                return ((x - this.x - rad) * (x - this.x - rad) + (y - this.y - rad) *
+                    (y - this.y - rad)) < (rad * rad);
+            }
             ~Circle() { }
         }
 
@@ -53,6 +92,49 @@ namespace lab_oop_7
             {
                 this.x = x - lenght / 2;
                 this.y = y;
+            }
+            public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
+            {
+                paint_box.CreateGraphics().DrawRectangle(pen, x,
+                                        y, lenght, wight);
+                paint_box.CreateGraphics().FillRectangle(figurefillcolor, x,
+                    y, lenght, wight);
+            }
+            public override void move_x(int x, Panel paint_box)
+            {
+                int l = this.x + x;
+                int gran = paint_box.ClientSize.Width - lenght;
+                check(l, x, gran, --gran, ref this.x);
+            }
+            public override void move_y(int y, Panel paint_box)
+            {
+                int l = this.y + y;
+                int gran = paint_box.ClientSize.Height - wight;
+                check(l, y, gran, --gran, ref this.y);
+            }
+            public override void changesize(int size)
+            {
+                lenght += size;
+                wight += size / 5;
+            }
+            public override bool checkfigure(int x, int y)
+            {
+                return (this.x <= x && x <= (this.x + lenght) && (this.y - 2) <= y &&
+                                    y <= (this.y + wight));
+            }
+        }
+
+        static public void check(int f, int chislo, int gran, int gran1, ref int x)
+        {   // Проверка на выход фигуры за границы
+            if (f > 0 && f < gran)
+                x += chislo;
+            else
+            {
+                if (f <= 0)
+                    x = 1;
+                else
+                    if (f >= gran1)
+                    x = gran1;
             }
         }
 
@@ -119,30 +201,34 @@ namespace lab_oop_7
 
         private void paint_figure(Color name, ref Storage stg, int index)
         {//рисуем круг на панели
-            Pen pen = new Pen(name, 4);
-            SolidBrush figurefillcolor;
+            //Pen pen = new Pen(name, 4);
+            //SolidBrush figurefillcolor;
             if (!stg.check_empty(index))
             {
+                Pen pen = new Pen(name, 4);
                 stg.objects[index].color = name;
-                figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
-                if (storag.objects[index] as Circle != null)
-                {// Если в хранилище круг
-                    Circle circle = stg.objects[index] as Circle;
-                    paint_box.CreateGraphics().DrawEllipse(
-                    pen, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
-                    paint_box.CreateGraphics().FillEllipse(
-                        figurefillcolor, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
-                }
-                else if (stg.objects[index] as Line != null)
-                {   // Если в хранилище линия
-                    Line line = stg.objects[index] as Line;
-                    paint_box.CreateGraphics().DrawRectangle(pen, line.x,
-                                            line.y, line.lenght, line.wight);
-                    paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
-                        line.y, line.lenght, line.wight);
-                }
+                SolidBrush figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
+                stg.objects[index].paint_figure(pen, figurefillcolor, paint_box);
+                //figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
+                //if (storag.objects[index] as Circle != null)
+                //{// Если в хранилище круг
+                //    Circle circle = stg.objects[index] as Circle;
+                //    paint_box.CreateGraphics().DrawEllipse(
+                //    pen, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
+                //    paint_box.CreateGraphics().FillEllipse(
+                //        figurefillcolor, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
+                //}
+                //else if (stg.objects[index] as Line != null)
+                //{   // Если в хранилище линия
+                //    Line line = stg.objects[index] as Line;
+                //    paint_box.CreateGraphics().DrawRectangle(pen, line.x,
+                //                            line.y, line.lenght, line.wight);
+                //    paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
+                //        line.y, line.lenght, line.wight);
+                //}
 
             }
+
         }
 
         private void button_del__item_storage_Click(object sender, EventArgs e)
@@ -230,19 +316,20 @@ namespace lab_oop_7
                 {
                     if (!stg.check_empty(i))
                     {
-                        if (stg.objects[i] as Circle != null)
-                        {
-                            Circle circle = stg.objects[i] as Circle;
-                            if (((x - circle.x - circle.rad) * (x - circle.x - circle.rad) + (y - circle.y - circle.rad) * (y - circle.y - circle.rad)) < (circle.rad * circle.rad))
-                                return i;
-                        }
-                        else if (stg.objects[i] as Line != null)
-                        {
-                            Line line = stg.objects[i] as Line;
-                            if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
-                                return i;
-                        }
-
+                        //if (stg.objects[i] as Circle != null)
+                        //{
+                        //    Circle circle = stg.objects[i] as Circle;
+                        //    if (((x - circle.x - circle.rad) * (x - circle.x - circle.rad) + (y - circle.y - circle.rad) * (y - circle.y - circle.rad)) < (circle.rad * circle.rad))
+                        //        return i;
+                        //}
+                        //else if (stg.objects[i] as Line != null)
+                        //{
+                        //    Line line = stg.objects[i] as Line;
+                        //    if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
+                        //        return i;
+                        //}
+                        if (stg.objects[i].checkfigure(x, y))
+                            return i;
 
 
                     }
@@ -356,18 +443,18 @@ namespace lab_oop_7
                 {   // Если под i индексом в хранилище есть объект
                     if (stg.objects[i].color == Color.Red)
                     {
-                        if (stg.objects[i] as Circle != null)
-                        {   // Если в хранилище круг
-                            Circle circle = stg.objects[i] as Circle;
-                            circle.rad += size;
-                        }
-                        else if (stg.objects[i] as Line != null)
-                        {   // Если в хранилище отрезок
-                            Line line = stg.objects[i] as Line;
-                            line.lenght += size;
-                            //line.wight += size / 5;
-                        }
-
+                        //if (stg.objects[i] as Circle != null)
+                        //{   // Если в хранилище круг
+                        //    Circle circle = stg.objects[i] as Circle;
+                        //    circle.rad += size;
+                        //}
+                        //else if (stg.objects[i] as Line != null)
+                        //{   // Если в хранилище отрезок
+                        //    Line line = stg.objects[i] as Line;
+                        //    line.lenght += size;
+                        //    //line.wight += size / 5;
+                        //}
+                        stg.objects[i].changesize(size);
                     }
                 }
             }
@@ -381,26 +468,27 @@ namespace lab_oop_7
                 {
                     if (stg.objects[i].color == Color.Red)
                     {   // Если объект выделен
-                        if (stg.objects[i] as Circle != null)
-                        {   // Если в хранилище круг
-                            Circle circle = stg.objects[i] as Circle;
-                            int c = circle.y + y;
-                            int gran = paint_box.ClientSize.Height - circle.rad * 2;
-                            // Проверяем на выход из границы поля
-                            check(c, y, gran, gran - 2, ref stg.objects[i], 2);
-                        }
-                        else
-                        {
-                            if (stg.objects[i] as Line != null)
-                            {   // Если в хранилище отрезок
-                                Line line = stg.objects[i] as Line;
-                                int l = line.y + y;
-                                int gran = paint_box.ClientSize.Height - line.wight;
-                                // Проверяем на выход из границы поля
-                                check(l, y, gran, --gran, ref stg.objects[i], 2);
-                            }
+                        //if (stg.objects[i] as Circle != null)
+                        //{   // Если в хранилище круг
+                        //    Circle circle = stg.objects[i] as Circle;
+                        //    int c = circle.y + y;
+                        //    int gran = paint_box.ClientSize.Height - circle.rad * 2;
+                        //    // Проверяем на выход из границы поля
+                        //    check(c, y, gran, gran - 2, ref stg.objects[i], 2);
+                        //}
+                        //else
+                        //{
+                        //    if (stg.objects[i] as Line != null)
+                        //    {   // Если в хранилище отрезок
+                        //        Line line = stg.objects[i] as Line;
+                        //        int l = line.y + y;
+                        //        int gran = paint_box.ClientSize.Height - line.wight;
+                        //        // Проверяем на выход из границы поля
+                        //        check(l, y, gran, --gran, ref stg.objects[i], 2);
+                        //    }
 
-                        }
+                        //}
+                        stg.objects[i].move_y(y, paint_box);
                     }
                 }
             }
@@ -414,47 +502,48 @@ namespace lab_oop_7
                 {
                     if (stg.objects[i].color == Color.Red)
                     {   // Если объект выделен
-                        if (stg.objects[i] as Circle != null)
-                        {   // Если в хранилище круг
-                            Circle circle = stg.objects[i] as Circle;
-                            int c = circle.x + x;
-                            int gran = paint_box.ClientSize.Width - (circle.rad * 2);
-                            // Проверяем на выход из границы поля
-                            check(c, x, gran, gran - 2, ref stg.objects[i], 1);
-                        }
-                        else
-                        {
-                            if (stg.objects[i] as Line != null)
-                            {   // Если в хранилище отрезок
-                                Line line = stg.objects[i] as Line;
-                                int l = line.x + x;
-                                int gran = paint_box.ClientSize.Width - line.lenght;
-                                // Проверяем на выход из границы поля
-                                check(l, x, gran, --gran, ref stg.objects[i], 1);
-                            }
+                        //if (stg.objects[i] as Circle != null)
+                        //{   // Если в хранилище круг
+                        //    Circle circle = stg.objects[i] as Circle;
+                        //    int c = circle.x + x;
+                        //    int gran = paint_box.ClientSize.Width - (circle.rad * 2);
+                        //    // Проверяем на выход из границы поля
+                        //    check(c, x, gran, gran - 2, ref stg.objects[i], 1);
+                        //}
+                        //else
+                        //{
+                        //    if (stg.objects[i] as Line != null)
+                        //    {   // Если в хранилище отрезок
+                        //        Line line = stg.objects[i] as Line;
+                        //        int l = line.x + x;
+                        //        int gran = paint_box.ClientSize.Width - line.lenght;
+                        //        // Проверяем на выход из границы поля
+                        //        check(l, x, gran, --gran, ref stg.objects[i], 1);
+                        //    }
 
-                        }
+                        //}
+                        stg.objects[i].move_x(x, paint_box);
                     }
                 }
             }
         }
 
-        private void check(int f, int y, int gran, int gran1, ref Figure figures, int g)
-        {   // Проверка на выход фигуры за границы
-            ref int b = ref figures.x;
-            if (g == 2)
-                b = ref figures.y;
-            if (f > 0 && f < gran)
-                b += y;
-            else
-            {
-                if (f <= 0)
-                    b = 1;
-                else
-                    if (f >= gran1)
-                    b = gran1;
-            }
-        }
+        //private void check(int f, int y, int gran, int gran1, ref Figure figures, int g)
+        //{   // Проверка на выход фигуры за границы
+        //    ref int b = ref figures.x;
+        //    if (g == 2)
+        //        b = ref figures.y;
+        //    if (f > 0 && f < gran)
+        //        b += y;
+        //    else
+        //    {
+        //        if (f <= 0)
+        //            b = 1;
+        //        else
+        //            if (f >= gran1)
+        //            b = gran1;
+        //    }
+        //}
 
     }
 }
