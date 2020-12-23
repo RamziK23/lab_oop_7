@@ -31,6 +31,7 @@ namespace lab_oop_7
             public Color color = Color.Navy;
             public Color fillcolor = Color.White;
 
+            public virtual void GroupAddFigure(ref Figure object1) { }
             public virtual void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box) { }
             public virtual void move_x(int x, Panel paint_box) { }
             public virtual void move_y(int y, Panel paint_box) { }
@@ -40,7 +41,63 @@ namespace lab_oop_7
 
         class Group : Figure
         {
+            public int maxcount = 10;
+            public Figure[] group;
+            public int count;
+            public Group()
+            {   // Выделяем maxcount мест в хранилище
+                count = 0;
+                group = new Figure[maxcount];
+                for (int i = 0; i < maxcount; ++i)
+                    group[i] = null;
+            }
+            public override void GroupAddFigure(ref Figure object1)
+            {
+                if (count >= maxcount)
+                    return;
+                group[count] = object1;
+                ++count;
+            }
+            public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    group[i].paint_figure(pen, figurefillcolor, paint_box);
+                }
+            }
 
+            public override void move_x(int x, Panel paint_box)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    group[i].move_x(x, paint_box);
+                }
+            }
+
+            public override void move_y(int y, Panel paint_box)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    group[i].move_y(y, paint_box);
+                }
+            }
+            public override void changesize(int size)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    group[i].changesize(size);
+                }
+            }
+
+            public override bool checkfigure(int x, int y)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    if (group[i].checkfigure(x, y))
+                        return true;
+                }
+                return false;
+            }
         }
 
         class Circle : Figure
@@ -138,7 +195,7 @@ namespace lab_oop_7
             }
         }
 
-        class Storage
+        public class Storage
         {
             public Figure[] objects;
             public Storage(int count)
@@ -165,7 +222,8 @@ namespace lab_oop_7
             public void delete_object(int ind)
             {//удаляет объект из хранилища
                 objects[ind] = null;
-                index--;
+                if (index > 0)
+                    index--;
             }
             public bool check_empty(int index)
             {//занято ли место
@@ -355,30 +413,30 @@ namespace lab_oop_7
             if (e.KeyCode == Keys.Delete)
             {
                 remove_selected_circle(ref storag);
-                paint_box.Refresh();
-                if (storag.occupied(k) != 0)
-                {
-                    for (int i = 0; i < k; ++i)
-                    {
-                        paint_figure(Color.Navy, ref storag, i);
-                    }
-                }
+                //paint_box.Refresh();
+                //if (storag.occupied(k) != 0)
+                //{
+                //    for (int i = 0; i < k; ++i)
+                //    {
+                //        paint_figure(Color.Navy, ref storag, i);
+                //    }
+                //}
             }
             if (e.KeyCode == Keys.Oemplus)
             {   // Увеличиваем размер фигуры
-                changesize(ref storag, 1);
-                paint_box.Refresh();
-                for (int i = 0; i < k; ++i)
-                    if (!storag.check_empty(i))
-                        paint_figure(storag.objects[i].color, ref storag, i);
+                changesize(ref storag, 5);
+                //paint_box.Refresh();
+                //for (int i = 0; i < k; ++i)
+                //    if (!storag.check_empty(i))
+                //        paint_figure(storag.objects[i].color, ref storag, i);
             }
             if (e.KeyCode == Keys.OemMinus)
             {   // Уменьшаем размер фигуры
-                changesize(ref storag, -1);
-                paint_box.Refresh();
-                for (int i = 0; i < k; ++i)
-                    if (!storag.check_empty(i))
-                        paint_figure(storag.objects[i].color, ref storag, i);
+                changesize(ref storag, -5);
+                //paint_box.Refresh();
+                //for (int i = 0; i < k; ++i)
+                //    if (!storag.check_empty(i))
+                //        paint_figure(storag.objects[i].color, ref storag, i);
             }
             if (e.KeyCode == Keys.W)
             {   // Перемещение по оси X вверх
@@ -526,6 +584,26 @@ namespace lab_oop_7
                     }
                 }
             }
+        }
+
+        private void button_group_Click(object sender, EventArgs e)
+        {
+            Figure group = new Group();
+            for (int i = 0; i < k; ++i)
+            {
+                if (!storag.check_empty(i))
+                    if (storag.objects[i].color == Color.Red)
+                    {
+                        group.GroupAddFigure(ref storag.objects[i]);
+                        storag.delete_object(i);
+                    }
+            }
+            storag.add_object(index, ref group, k, ref indexin);
+        }
+
+        private void button_ungroup_Click(object sender, EventArgs e)
+        {
+           
         }
 
         //private void check(int f, int y, int gran, int gran1, ref Figure figures, int g)

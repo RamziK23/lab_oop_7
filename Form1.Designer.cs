@@ -34,6 +34,8 @@
             this.drawline = new System.Windows.Forms.Button();
             this.button_color = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.button_group = new System.Windows.Forms.Button();
+            this.button_ungroup = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // paint_box
@@ -50,7 +52,7 @@
             // 
             this.button_del__item_storage.Location = new System.Drawing.Point(693, 12);
             this.button_del__item_storage.Name = "button_del__item_storage";
-            this.button_del__item_storage.Size = new System.Drawing.Size(75, 23);
+            this.button_del__item_storage.Size = new System.Drawing.Size(102, 23);
             this.button_del__item_storage.TabIndex = 4;
             this.button_del__item_storage.Text = "Удалить";
             this.button_del__item_storage.UseVisualStyleBackColor = true;
@@ -61,7 +63,7 @@
             // 
             this.drawellipse.Location = new System.Drawing.Point(693, 41);
             this.drawellipse.Name = "drawellipse";
-            this.drawellipse.Size = new System.Drawing.Size(75, 23);
+            this.drawellipse.Size = new System.Drawing.Size(102, 23);
             this.drawellipse.TabIndex = 6;
             this.drawellipse.Text = "Круг";
             this.drawellipse.UseVisualStyleBackColor = true;
@@ -72,7 +74,7 @@
             // 
             this.drawline.Location = new System.Drawing.Point(693, 70);
             this.drawline.Name = "drawline";
-            this.drawline.Size = new System.Drawing.Size(75, 23);
+            this.drawline.Size = new System.Drawing.Size(102, 23);
             this.drawline.TabIndex = 7;
             this.drawline.Text = "Линия";
             this.drawline.UseVisualStyleBackColor = true;
@@ -83,7 +85,7 @@
             // 
             this.button_color.Location = new System.Drawing.Point(693, 99);
             this.button_color.Name = "button_color";
-            this.button_color.Size = new System.Drawing.Size(75, 23);
+            this.button_color.Size = new System.Drawing.Size(102, 23);
             this.button_color.TabIndex = 10;
             this.button_color.Text = "Цвет";
             this.button_color.UseVisualStyleBackColor = true;
@@ -94,11 +96,34 @@
             // 
             this.colorDialog1.Color = System.Drawing.Color.White;
             // 
+            // button_group
+            // 
+            this.button_group.Location = new System.Drawing.Point(693, 128);
+            this.button_group.Name = "button_group";
+            this.button_group.Size = new System.Drawing.Size(102, 23);
+            this.button_group.TabIndex = 11;
+            this.button_group.Text = "Группировка";
+            this.button_group.UseVisualStyleBackColor = true;
+            this.button_group.Click += new System.EventHandler(this.button_group_Click);
+            this.button_group.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            // 
+            // button_ungroup
+            // 
+            this.button_ungroup.Location = new System.Drawing.Point(693, 157);
+            this.button_ungroup.Name = "button_ungroup";
+            this.button_ungroup.Size = new System.Drawing.Size(102, 23);
+            this.button_ungroup.TabIndex = 12;
+            this.button_ungroup.Text = "Разгруппировка";
+            this.button_ungroup.UseVisualStyleBackColor = true;
+            this.button_ungroup.Click += new System.EventHandler(this.button_ungroup_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(890, 450);
+            this.Controls.Add(this.button_ungroup);
+            this.Controls.Add(this.button_group);
             this.Controls.Add(this.button_color);
             this.Controls.Add(this.drawline);
             this.Controls.Add(this.drawellipse);
@@ -118,6 +143,8 @@
         private System.Windows.Forms.Button drawline;
         private System.Windows.Forms.Button button_color;
         private System.Windows.Forms.ColorDialog colorDialog1;
+        private System.Windows.Forms.Button button_group;
+        private System.Windows.Forms.Button button_ungroup;
     }
 }
 
