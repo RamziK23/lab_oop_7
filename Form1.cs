@@ -18,7 +18,6 @@ namespace lab_oop_7
             InitializeComponent();
         }
 
-
         int p = 0;
         static int k = 5;
         Storage storag = new Storage(k);
@@ -30,19 +29,21 @@ namespace lab_oop_7
         {
             public int x, y;
             public Color color = Color.Navy;
-            public Color fillcolor = Color.White;
+            public Color fillcolor;
 
             public Figure() { }
             public virtual string save() { return ""; }
-            public virtual void load(string x, string y, string c) { }
-            public virtual void load(ref StreamReader sr, Figure figure) { }
+            public virtual void load(string x, string y, string c, string fillcolor) { }
+            public virtual void load(ref StreamReader sr, Figure figure, CreateFigure createFigure) { }
             public virtual void GroupAddFigure(ref Figure object1) { }
             public virtual void UnGroup(ref Storage stg, int c) { }
-            public virtual void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box) { }
+            public virtual void paint_figure(Pen pen, Panel paint_box) { }
             public virtual void move_x(int x, Panel paint_box) { }
             public virtual void move_y(int y, Panel paint_box) { }
             public virtual void changesize(int size) { }
             public virtual bool checkfigure(int x, int y) { return false; }
+            public virtual void setcolor(Color color) { }
+            public virtual void caseswitch(ref StreamReader sr, ref Figure figure, CreateFigure createFigure) { }
         }
 
         class Group : Figure
@@ -64,12 +65,12 @@ namespace lab_oop_7
                     str += "\n" + group[i].save();
                 return str;
             }
-            public override void load(ref StreamReader sr, Figure figure)
+            public override void load(ref StreamReader sr, Figure figure, CreateFigure createFigure)
             {
                 int chislo = Convert.ToInt32(sr.ReadLine());
                 for (int i = 0; i < chislo; ++i)
                 {
-                    caseswitch(ref sr, ref figure);
+                    createFigure.caseswitch(ref sr, ref figure, createFigure);
                     GroupAddFigure(ref figure);
                 }
             }
@@ -88,11 +89,11 @@ namespace lab_oop_7
                     stg.add_object(index, ref group[i], k, ref indexin);
                 }
             }
-            public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
+            public override void paint_figure(Pen pen, Panel paint_box)
             {
                 for (int i = 0; i < count; ++i)
                 {
-                    group[i].paint_figure(pen, figurefillcolor, paint_box);
+                    group[i].paint_figure(pen, paint_box);
                 }
             }
 
@@ -128,11 +129,38 @@ namespace lab_oop_7
                 }
                 return false;
             }
+            public override void setcolor(Color color)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    group[i].setcolor(color);
+                }
+            }
         }
-
+        public class CreateFigure : Figure
+        {
+            public override void caseswitch(ref StreamReader sr, ref Figure figure, CreateFigure createFigure)
+            {
+                string str = sr.ReadLine();
+                switch (str)
+                {   // В зависимости какая фигура выбрана
+                    case "Circle":
+                        figure = new Circle();
+                        figure.load(sr.ReadLine(), sr.ReadLine(), sr.ReadLine(), sr.ReadLine());
+                        break;
+                    case "Line":
+                        figure = new Line();
+                        figure.load(sr.ReadLine(), sr.ReadLine(), sr.ReadLine(), sr.ReadLine());
+                        break;
+                    case "Group":
+                        figure = new Group();
+                        figure.load(ref sr, figure, createFigure);
+                        break;
+                }
+            }
+        }
         class Circle : Figure
         {
-            //public int x, y; // Координаты круга
             public int rad; // Радиус круга
             public Circle() { }
             public Circle(int x, int y, int rad)
@@ -143,16 +171,18 @@ namespace lab_oop_7
             }
             public override string save()
             {
-                return "Circle" + "\n" + x + "\n" + y + "\n" + rad;
+                return "Circle" + "\n" + x + "\n" + y + "\n" + rad + "\n" + fillcolor.ToArgb().ToString();
             }
-            public override void load(string x, string y, string rad)
+            public override void load(string x, string y, string rad, string fillcolor)
             {
                 this.x = Convert.ToInt32(x);
                 this.y = Convert.ToInt32(y);
                 this.rad = Convert.ToInt32(rad);
+                this.fillcolor = Color.FromArgb(Convert.ToInt32(fillcolor));
             }
-            public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
+            public override void paint_figure(Pen pen, Panel paint_box)
             {
+                SolidBrush figurefillcolor = new SolidBrush(fillcolor);
                 paint_box.CreateGraphics().DrawEllipse(
                     pen, x, y, rad * 2, rad * 2);
                 paint_box.CreateGraphics().FillEllipse(
@@ -179,7 +209,11 @@ namespace lab_oop_7
                 return ((x - this.x - rad) * (x - this.x - rad) + (y - this.y - rad) *
                     (y - this.y - rad)) < (rad * rad);
             }
-            ~Circle() { }
+            public override void setcolor(Color color)
+            {
+                fillcolor = color;
+            }
+            //~Circle() { }
         }
 
         class Line : Figure
@@ -195,16 +229,18 @@ namespace lab_oop_7
             }
             public override string save()
             {
-                return "Line" + "\n" + x + "\n" + y + "\n" + lenght;
+                return "Line" + "\n" + x + "\n" + y + "\n" + lenght + "\n" + fillcolor.ToArgb().ToString();
             }
-            public override void load(string x, string y, string lenght)
+            public override void load(string x, string y, string lenght, string fillcolor)
             {
                 this.x = Convert.ToInt32(x);
                 this.y = Convert.ToInt32(y);
                 this.lenght = Convert.ToInt32(lenght);
+                this.fillcolor = Color.FromArgb(Convert.ToInt32(fillcolor));
             }
-            public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
+            public override void paint_figure(Pen pen, Panel paint_box)
             {
+                SolidBrush figurefillcolor = new SolidBrush(fillcolor);
                 paint_box.CreateGraphics().DrawRectangle(pen, x,
                                         y, lenght, wight);
                 paint_box.CreateGraphics().FillRectangle(figurefillcolor, x,
@@ -231,6 +267,10 @@ namespace lab_oop_7
             {
                 return (this.x <= x && x <= (this.x + lenght) && (this.y - 2) <= y &&
                                     y <= (this.y + wight));
+            }
+            public override void setcolor(Color color)
+            {
+                fillcolor = color;
             }
         }
 
@@ -318,26 +358,7 @@ namespace lab_oop_7
             {
                 Pen pen = new Pen(name, 4);
                 stg.objects[index].color = name;
-                SolidBrush figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
-                stg.objects[index].paint_figure(pen, figurefillcolor, paint_box);
-                //figurefillcolor = new SolidBrush(stg.objects[index].fillcolor);
-                //if (storag.objects[index] as Circle != null)
-                //{// Если в хранилище круг
-                //    Circle circle = stg.objects[index] as Circle;
-                //    paint_box.CreateGraphics().DrawEllipse(
-                //    pen, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
-                //    paint_box.CreateGraphics().FillEllipse(
-                //        figurefillcolor, circle.x, circle.y, circle.rad * 2, circle.rad * 2);
-                //}
-                //else if (stg.objects[index] as Line != null)
-                //{   // Если в хранилище линия
-                //    Line line = stg.objects[index] as Line;
-                //    paint_box.CreateGraphics().DrawRectangle(pen, line.x,
-                //                            line.y, line.lenght, line.wight);
-                //    paint_box.CreateGraphics().FillRectangle(figurefillcolor, line.x,
-                //        line.y, line.lenght, line.wight);
-                //}
-
+                stg.objects[index].paint_figure(pen, paint_box);
             }
 
         }
@@ -427,22 +448,8 @@ namespace lab_oop_7
                 {
                     if (!stg.check_empty(i))
                     {
-                        //if (stg.objects[i] as Circle != null)
-                        //{
-                        //    Circle circle = stg.objects[i] as Circle;
-                        //    if (((x - circle.x - circle.rad) * (x - circle.x - circle.rad) + (y - circle.y - circle.rad) * (y - circle.y - circle.rad)) < (circle.rad * circle.rad))
-                        //        return i;
-                        //}
-                        //else if (stg.objects[i] as Line != null)
-                        //{
-                        //    Line line = stg.objects[i] as Line;
-                        //    if (line.x <= x && x <= (line.x + line.lenght) && (line.y - 2) <= y && y <= (line.y + line.wight))
-                        //        return i;
-                        //}
                         if (stg.objects[i].checkfigure(x, y))
                             return i;
-
-
                     }
                 }
             }
@@ -466,30 +473,14 @@ namespace lab_oop_7
             if (e.KeyCode == Keys.Delete)
             {
                 remove_selected_circle(ref storag);
-                //paint_box.Refresh();
-                //if (storag.occupied(k) != 0)
-                //{
-                //    for (int i = 0; i < k; ++i)
-                //    {
-                //        paint_figure(Color.Navy, ref storag, i);
-                //    }
-                //}
             }
             if (e.KeyCode == Keys.Oemplus)
             {   // Увеличиваем размер фигуры
                 changesize(ref storag, 5);
-                //paint_box.Refresh();
-                //for (int i = 0; i < k; ++i)
-                //    if (!storag.check_empty(i))
-                //        paint_figure(storag.objects[i].color, ref storag, i);
             }
             if (e.KeyCode == Keys.OemMinus)
             {   // Уменьшаем размер фигуры
                 changesize(ref storag, -5);
-                //paint_box.Refresh();
-                //for (int i = 0; i < k; ++i)
-                //    if (!storag.check_empty(i))
-                //        paint_figure(storag.objects[i].color, ref storag, i);
             }
             if (e.KeyCode == Keys.W)
             {   // Перемещение по оси X вверх
@@ -529,7 +520,7 @@ namespace lab_oop_7
         }
 
         private void button_color_Click(object sender, EventArgs e)
-        {
+        {//выбор цвета
             if (colorDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
             button_color.BackColor = colorDialog1.Color;
@@ -538,7 +529,7 @@ namespace lab_oop_7
                 if (!storag.check_empty(i))
                     if (storag.objects[i].color == Color.Red)
                     {
-                        storag.objects[i].fillcolor = colorDialog1.Color;
+                        storag.objects[i].setcolor(colorDialog1.Color);
                         paint_figure(storag.objects[i].color, ref storag, i);
                     }
             }
@@ -554,17 +545,6 @@ namespace lab_oop_7
                 {   // Если под i индексом в хранилище есть объект
                     if (stg.objects[i].color == Color.Red)
                     {
-                        //if (stg.objects[i] as Circle != null)
-                        //{   // Если в хранилище круг
-                        //    Circle circle = stg.objects[i] as Circle;
-                        //    circle.rad += size;
-                        //}
-                        //else if (stg.objects[i] as Line != null)
-                        //{   // Если в хранилище отрезок
-                        //    Line line = stg.objects[i] as Line;
-                        //    line.lenght += size;
-                        //    //line.wight += size / 5;
-                        //}
                         stg.objects[i].changesize(size);
                     }
                 }
@@ -578,27 +558,7 @@ namespace lab_oop_7
                 if (!stg.check_empty(i))
                 {
                     if (stg.objects[i].color == Color.Red)
-                    {   // Если объект выделен
-                        //if (stg.objects[i] as Circle != null)
-                        //{   // Если в хранилище круг
-                        //    Circle circle = stg.objects[i] as Circle;
-                        //    int c = circle.y + y;
-                        //    int gran = paint_box.ClientSize.Height - circle.rad * 2;
-                        //    // Проверяем на выход из границы поля
-                        //    check(c, y, gran, gran - 2, ref stg.objects[i], 2);
-                        //}
-                        //else
-                        //{
-                        //    if (stg.objects[i] as Line != null)
-                        //    {   // Если в хранилище отрезок
-                        //        Line line = stg.objects[i] as Line;
-                        //        int l = line.y + y;
-                        //        int gran = paint_box.ClientSize.Height - line.wight;
-                        //        // Проверяем на выход из границы поля
-                        //        check(l, y, gran, --gran, ref stg.objects[i], 2);
-                        //    }
-
-                        //}
+                    {
                         stg.objects[i].move_y(y, paint_box);
                     }
                 }
@@ -612,27 +572,7 @@ namespace lab_oop_7
                 if (!stg.check_empty(i))
                 {
                     if (stg.objects[i].color == Color.Red)
-                    {   // Если объект выделен
-                        //if (stg.objects[i] as Circle != null)
-                        //{   // Если в хранилище круг
-                        //    Circle circle = stg.objects[i] as Circle;
-                        //    int c = circle.x + x;
-                        //    int gran = paint_box.ClientSize.Width - (circle.rad * 2);
-                        //    // Проверяем на выход из границы поля
-                        //    check(c, x, gran, gran - 2, ref stg.objects[i], 1);
-                        //}
-                        //else
-                        //{
-                        //    if (stg.objects[i] as Line != null)
-                        //    {   // Если в хранилище отрезок
-                        //        Line line = stg.objects[i] as Line;
-                        //        int l = line.x + x;
-                        //        int gran = paint_box.ClientSize.Width - line.lenght;
-                        //        // Проверяем на выход из границы поля
-                        //        check(l, x, gran, --gran, ref stg.objects[i], 1);
-                        //    }
-
-                        //}
+                    {
                         stg.objects[i].move_x(x, paint_box);
                     }
                 }
@@ -683,26 +623,6 @@ namespace lab_oop_7
                 }
         }
 
-        static void caseswitch(ref StreamReader sr, ref Figure figure)
-        {
-            string str = sr.ReadLine();
-            switch (str)
-            {   // В зависимости какая фигура выбрана
-                case "Circle":
-                    figure = new Circle();
-                    figure.load(sr.ReadLine(), sr.ReadLine(), sr.ReadLine());
-                    break;
-                case "Line":
-                    figure = new Line();
-                    figure.load(sr.ReadLine(), sr.ReadLine(), sr.ReadLine());
-                    break;
-                case "Group":
-                    figure = new Group();
-                    figure.load(ref sr, figure);
-                    break;
-            }
-
-        }
         private void button_load_Click(object sender, EventArgs e)
         {
             StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
@@ -712,7 +632,8 @@ namespace lab_oop_7
                 for (int i = 0; i < strend; ++i)
                 {
                     Figure figure = new Figure();
-                    caseswitch(ref sr, ref figure);
+                    CreateFigure create = new CreateFigure();
+                    create.caseswitch(ref sr, ref figure, create);
                     if (index == k)
                         storag.increase(ref k);
                     storag.add_object(index, ref figure, k, ref indexin);
@@ -722,22 +643,5 @@ namespace lab_oop_7
                 sr.Close();
             }
         }
-        //private void check(int f, int y, int gran, int gran1, ref Figure figures, int g)
-        //{   // Проверка на выход фигуры за границы
-        //    ref int b = ref figures.x;
-        //    if (g == 2)
-        //        b = ref figures.y;
-        //    if (f > 0 && f < gran)
-        //        b += y;
-        //    else
-        //    {
-        //        if (f <= 0)
-        //            b = 1;
-        //        else
-        //            if (f >= gran1)
-        //            b = gran1;
-        //    }
-        //}
-
     }
 }
