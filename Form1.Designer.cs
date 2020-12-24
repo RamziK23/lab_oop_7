@@ -36,10 +36,15 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.button_group = new System.Windows.Forms.Button();
             this.button_ungroup = new System.Windows.Forms.Button();
+            this.button_save = new System.Windows.Forms.Button();
+            this.button_load = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // paint_box
             // 
+            this.paint_box.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.paint_box.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.paint_box.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.paint_box.Location = new System.Drawing.Point(12, 12);
@@ -118,11 +123,35 @@
             this.button_ungroup.Click += new System.EventHandler(this.button_ungroup_Click);
             this.button_ungroup.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
+            // button_save
+            // 
+            this.button_save.Location = new System.Drawing.Point(693, 186);
+            this.button_save.Name = "button_save";
+            this.button_save.Size = new System.Drawing.Size(102, 23);
+            this.button_save.TabIndex = 13;
+            this.button_save.Text = "Save";
+            this.button_save.UseVisualStyleBackColor = true;
+            this.button_save.Click += new System.EventHandler(this.button_save_Click);
+            this.button_save.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            // 
+            // button_load
+            // 
+            this.button_load.Location = new System.Drawing.Point(693, 215);
+            this.button_load.Name = "button_load";
+            this.button_load.Size = new System.Drawing.Size(102, 23);
+            this.button_load.TabIndex = 14;
+            this.button_load.Text = "Load";
+            this.button_load.UseVisualStyleBackColor = true;
+            this.button_load.Click += new System.EventHandler(this.button_load_Click);
+            this.button_load.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(890, 450);
+            this.Controls.Add(this.button_load);
+            this.Controls.Add(this.button_save);
             this.Controls.Add(this.button_ungroup);
             this.Controls.Add(this.button_group);
             this.Controls.Add(this.button_color);
@@ -146,6 +175,8 @@
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Button button_group;
         private System.Windows.Forms.Button button_ungroup;
+        private System.Windows.Forms.Button button_save;
+        private System.Windows.Forms.Button button_load;
     }
 }
 

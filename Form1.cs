@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace lab_oop_7
 {
@@ -21,9 +22,9 @@ namespace lab_oop_7
         int p = 0;
         static int k = 5;
         Storage storag = new Storage(k);
-        static int index = 0;
-        static int indexin = 0;
-        int figure_now = 0;
+        static int index = 0; // Кол-во нарисованных фигур
+        static int indexin = 0; // Индекс, в какое место была помещена фигура
+        int figure_now = 1; // Какая фигура выбрана
 
         public class Figure
         {
@@ -31,6 +32,10 @@ namespace lab_oop_7
             public Color color = Color.Navy;
             public Color fillcolor = Color.White;
 
+            public Figure() { }
+            public virtual string save() { return ""; }
+            public virtual void load(string x, string y, string c) { }
+            public virtual void load(ref StreamReader sr, Figure figure) { }
             public virtual void GroupAddFigure(ref Figure object1) { }
             public virtual void UnGroup(ref Storage stg, int c) { }
             public virtual void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box) { }
@@ -51,6 +56,22 @@ namespace lab_oop_7
                 group = new Figure[maxcount];
                 for (int i = 0; i < maxcount; ++i)
                     group[i] = null;
+            }
+            public override string save()
+            {
+                string str = "Group" + "\n" + count;
+                for (int i = 0; i < count; ++i)
+                    str += "\n" + group[i].save();
+                return str;
+            }
+            public override void load(ref StreamReader sr, Figure figure)
+            {
+                int chislo = Convert.ToInt32(sr.ReadLine());
+                for (int i = 0; i < chislo; ++i)
+                {
+                    caseswitch(ref sr, ref figure);
+                    GroupAddFigure(ref figure);
+                }
             }
             public override void GroupAddFigure(ref Figure object1)
             {
@@ -112,11 +133,23 @@ namespace lab_oop_7
         class Circle : Figure
         {
             //public int x, y; // Координаты круга
-            public int rad = 15; // Радиус круга
-            public Circle(int x, int y)
+            public int rad; // Радиус круга
+            public Circle() { }
+            public Circle(int x, int y, int rad)
             {
+                this.rad = rad;
                 this.x = x - rad;
                 this.y = y - rad;
+            }
+            public override string save()
+            {
+                return "Circle" + "\n" + x + "\n" + y + "\n" + rad;
+            }
+            public override void load(string x, string y, string rad)
+            {
+                this.x = Convert.ToInt32(x);
+                this.y = Convert.ToInt32(y);
+                this.rad = Convert.ToInt32(rad);
             }
             public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
             {
@@ -153,11 +186,22 @@ namespace lab_oop_7
         {
             //public int x, y;
             public int lenght = 60;
-            public int wight = 5;
+            public int wight = 10;
+            public Line() { }
             public Line(int x, int y)
             {
                 this.x = x - lenght / 2;
                 this.y = y;
+            }
+            public override string save()
+            {
+                return "Line" + "\n" + x + "\n" + y + "\n" + lenght;
+            }
+            public override void load(string x, string y, string lenght)
+            {
+                this.x = Convert.ToInt32(x);
+                this.y = Convert.ToInt32(y);
+                this.lenght = Convert.ToInt32(lenght);
             }
             public override void paint_figure(Pen pen, Brush figurefillcolor, Panel paint_box)
             {
@@ -358,7 +402,7 @@ namespace lab_oop_7
                     case 0:
                         return;
                     case 1:
-                        figure = new Circle(e.X, e.Y);
+                        figure = new Circle(e.X, e.Y, 15);
                         break;
                     case 2:
                         figure = new Line(e.X, e.Y);
@@ -623,6 +667,61 @@ namespace lab_oop_7
             }
         }
 
+        string path = @"C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\Test.txt";
+        private void button_save_Click(object sender, EventArgs e)
+        {
+                using (StreamWriter sw = new StreamWriter(path, false, System.Text.Encoding.Default))
+                {
+                    sw.WriteLine(storag.occupied(k));
+                    for (int i = 0; i < k; ++i)
+                    {
+                        if (!storag.check_empty(i))
+                        {
+                            sw.WriteLine(storag.objects[i].save());
+                        }
+                    }
+                }
+        }
+
+        static void caseswitch(ref StreamReader sr, ref Figure figure)
+        {
+            string str = sr.ReadLine();
+            switch (str)
+            {   // В зависимости какая фигура выбрана
+                case "Circle":
+                    figure = new Circle();
+                    figure.load(sr.ReadLine(), sr.ReadLine(), sr.ReadLine());
+                    break;
+                case "Line":
+                    figure = new Line();
+                    figure.load(sr.ReadLine(), sr.ReadLine(), sr.ReadLine());
+                    break;
+                case "Group":
+                    figure = new Group();
+                    figure.load(ref sr, figure);
+                    break;
+            }
+
+        }
+        private void button_load_Click(object sender, EventArgs e)
+        {
+            StreamReader sr = new StreamReader(path, System.Text.Encoding.Default);
+            {
+                string str = sr.ReadLine();
+                int strend = Convert.ToInt32(str);
+                for (int i = 0; i < strend; ++i)
+                {
+                    Figure figure = new Figure();
+                    caseswitch(ref sr, ref figure);
+                    if (index == k)
+                        storag.increase(ref k);
+                    storag.add_object(index, ref figure, k, ref indexin);
+                    ++index;
+                }
+                paint_all(ref storag);
+                sr.Close();
+            }
+        }
         //private void check(int f, int y, int gran, int gran1, ref Figure figures, int g)
         //{   // Проверка на выход фигуры за границы
         //    ref int b = ref figures.x;
